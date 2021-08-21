@@ -13,7 +13,16 @@ const transformOffsets = [ // Offsets to make the dice appear to spin randomly
     {x: 360, y: 0, z: 360},
 ];
 
-document.querySelector("body").addEventListener("click", async e => {
+const maxDice = 8;
+const wrapper = document.querySelector('.wrapper');
+const body = document.querySelector("body");
+const dieTemplate = document.querySelector('#die-template');
+const btnAdd = document.querySelector('button.add');
+const btnRemove = document.querySelector('button.remove');
+
+body.addEventListener("click", async e => {
+  if (e.target !== body) return;
+
   const dice = document.querySelectorAll(".die");
   for (const die of dice) if (die.dataset.rolling === '1') return;
 
@@ -24,7 +33,7 @@ document.querySelector("body").addEventListener("click", async e => {
     const transform = `rotateX(${x}deg) rotateY(${y}deg) rotateZ(${z}deg)`;
 
     await die.animate([{transform}], {
-      delay: getRandomInt(0, 250), // Add a tiny varation.
+      delay: getRandomInt(0, 200), // Add a tiny varation.
       duration: 1000,
       easing: 'ease-out',
     }).finished;
@@ -35,6 +44,37 @@ document.querySelector("body").addEventListener("click", async e => {
   });
 });
 
+btnAdd.addEventListener('click', addDie);
+btnRemove.addEventListener('click', removeDie);
+
+function addDie() {
+  wrapper.appendChild(dieTemplate.content.cloneNode(true));
+  refreshUI()
+}
+
+function removeDie() {
+  wrapper.removeChild(wrapper.lastElementChild);
+  refreshUI();
+}
+
+function refreshUI() {
+  const dieCount = document.querySelectorAll(".die").length;
+  if (dieCount <= 1) {
+    btnRemove.disabled = true;
+    btnRemove.classList.add('disabled');
+  } else {
+    btnRemove.disabled = false;
+    btnRemove.classList.remove('disabled');
+  }
+  if (dieCount >= maxDice) {
+    btnAdd.disabled = true;
+    btnAdd.classList.add('disabled');
+  } else {
+    btnAdd.disabled = false;
+    btnAdd.classList.remove('disabled');
+  }
+}
+
 function calcTransform(roll = 0, counter) {
   const r = transformPositions[roll];
   const v = transformOffsets[counter % transformOffsets.length];
@@ -42,7 +82,7 @@ function calcTransform(roll = 0, counter) {
   return {
     x: r.x + v.x,
     y: r.y + v.y,
-    z: r.x + v.z,
+    z: r.z + v.z,
   }
 }
 
@@ -51,3 +91,5 @@ function getRandomInt(min, max) {
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min)) + min;
 }
+
+addDie();

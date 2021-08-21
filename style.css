@@ -1,33 +1,66 @@
 * {
   margin: 0;
   padding: 0;
-  vertical-align: baseline;
 }
 
 html {
   font-family: system-ui, sans-serif;
+  height: 100%;
 }
 
 body {
-  display: grid;
-  justify-content: center;
+  display: flex;
   align-items: center;
-  height: 100vh;
+  justify-content: center;
+  height: 100%;
   width: 100%;
   overflow: hidden;
   cursor: pointer;
   background: linear-gradient(#3e3e3e, #4a4a4a, #3e3e3e);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
+.btn-wrapper {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  pointer-events: none;
+}
+
+.btn-wrapper button {
+  pointer-events: all;
+  cursor: pointer;
+  border: 0;
+  width: 3rem;
+  height: 3rem;
+  color: #a6a6a6;
+  background-color: transparent;
+}
+  button svg {
+    width: 2rem;
+    height: 2rem;
+  }
+  button.disabled {
+    color: #616161;
+    cursor: default;
+  }
+
 .wrapper {
-  width: 25rem;
-  height: 25rem;
-  display: grid;
-  justify-items: center;
+  display: flex;
+  flex-direction: row;
   align-items: center;
-  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
-  grid-template-rows: auto;
-  perspective: 600px;
+  justify-content: center;
+  perspective: 1000px;
+  pointer-events: none;
+  height: 80vh;
+  width: 70vw;
+  gap: 4rem;
+  perspective-origin: 80% 60%;
+  flex-wrap: wrap;
+  align-content: center;
+  max-width: calc((6rem * 4) + (4rem * 5));
+  max-height: calc((6rem * 4) + (4rem * 5));
 }
 
 .die {
@@ -47,7 +80,7 @@ body {
   display: block;
   width: 6rem;
   height: 6rem;
-  box-shadow: 2rem 2rem 5rem 0rem rgb(0 0 0 / 30%);
+  box-shadow: 2rem 2rem 3rem 0rem rgb(0 0 0 / 20%);
 }
 
 .die-face {
@@ -81,7 +114,7 @@ body {
   justify-self: center;
   background-color: #676767;
   border-radius: 50%;
-  box-shadow: inset -0.15rem 0.15rem 0.25rem rgba(0, 0, 0, 0.5);
+  box-shadow: inset 0 0 0.5rem 0px rgb(0 0 0 / 50%);
 }
 
 .face-1 {
@@ -173,7 +206,7 @@ body {
 }
 
 @media (min-width: 900px) {
-  body > div {
-    perspective: 1500px;
+  .wrapper {
+    perspective: 2000px;
   }
 }
