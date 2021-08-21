@@ -1,0 +1,8 @@
+{
+  "short_name": "Dice",
+  "name": "Dice",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#3e3e3e",
+  "background_color": "#3e3e3e"
+}
