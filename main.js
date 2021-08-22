@@ -14,7 +14,7 @@ const transformOffsets = [ // Offsets to make the dice appear to spin randomly
 ];
 
 const maxDice = 8;
-const wrapper = document.querySelector('.wrapper');
+const wrapper = document.querySelector('.dice-wrapper');
 const body = document.querySelector("body");
 const dieTemplate = document.querySelector('#die-template');
 const btnAdd = document.querySelector('button.add');
