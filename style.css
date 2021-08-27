@@ -1,6 +1,8 @@
 :root {
   --btn-padding: .6rem;
   --btn-size: 1.5rem;
+  --die-size: 5rem;
+  --die-padding: 6%;
 }
 
 * {
@@ -74,8 +76,8 @@ body {
   perspective-origin: 80% 60%;
   flex-wrap: wrap;
   align-content: center;
-  max-width: calc((6rem * 4) + (4rem * 5));
-  max-height: calc((6rem * 4) + (4rem * 5));
+  max-width: calc((var(--die-size) * 4) + (4rem * 5));
+  max-height: calc((var(--die-size) * 4) + (4rem * 5));
 }
 
 /* Die shadow */
@@ -83,8 +85,8 @@ body {
   position: absolute;
   content: "";
   display: block;
-  width: 6rem;
-  height: 6rem;
+  width: var(--die-size);
+  height: var(--die-size);
   box-shadow: 2rem 2rem 3rem 0rem rgb(0 0 0 / 20%);
 }
 
@@ -92,10 +94,10 @@ body {
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 1fr;
-  height: 6rem;
+  height: var(--die-size);
   list-style-type: none;
   transform-style: preserve-3d;
-  width: 6rem;
+  width: var(--die-size);
 }
 
 .die-face {
@@ -112,7 +114,7 @@ body {
   grid-template-rows: repeat(3, 1fr);
   height: 100%;
   width: 100%;
-  padding: 0.4rem;
+  padding: var(--die-padding);
   box-sizing: border-box;
   backface-visibility: hidden;
 }
@@ -123,8 +125,8 @@ body {
 
 .dot {
   display: block;
-  height: 1.2rem;
-  width: 1.2rem;
+  height: 72%;
+  width: 72%;
   align-self: center;
   justify-self: center;
   background-color: #333333;
@@ -133,27 +135,27 @@ body {
 }
 
 .dot.small {
-  height: 1.1rem;
-  width: 1.1rem;
+  height: 66%;
+  width: 66%;
 }
 
 .face-1 {
-  transform: rotate3d(0, 0, 0, 90deg) translateZ(3rem);
+  transform: rotate3d(0, 0, 0, 90deg) translateZ(calc(0.5 * var(--die-size)));
 }
 .face-2 {
-  transform: rotate3d(-1, 0, 0, 90deg) translateZ(3rem);
+  transform: rotate3d(-1, 0, 0, 90deg) translateZ(calc(0.5 * var(--die-size)));
 }
 .face-3 {
-  transform: rotate3d(0, 1, 0, 90deg) translateZ(3rem);
+  transform: rotate3d(0, 1, 0, 90deg) translateZ(calc(0.5 * var(--die-size)));
 }
 .face-4 {
-  transform: rotate3d(0, -1, 0, 90deg) translateZ(3rem);
+  transform: rotate3d(0, -1, 0, 90deg) translateZ(calc(0.5 * var(--die-size)));
 }
 .face-5 {
-  transform: rotate3d(1, 0, 0, 90deg) translateZ(3rem);
+  transform: rotate3d(1, 0, 0, 90deg) translateZ(calc(0.5 * var(--die-size)));
 }
 .face-6 {
-  transform: rotate3d(1, 0, 0, 180deg) translateZ(3rem);
+  transform: rotate3d(1, 0, 0, 180deg) translateZ(calc(0.5 * var(--die-size)));
 }
 
 .face-1 .dot:nth-of-type(1) {
