@@ -98,6 +98,21 @@ body {
   list-style-type: none;
   transform-style: preserve-3d;
   width: var(--die-size);
+  animation: 0.2s die-show linear;
+}
+
+@keyframes die-show {
+    from {
+      transform: translateZ(-20rem);
+      opacity: 0;
+    }
+    to {
+      transform: translateZ(0);
+      opacity: 1;
+    }
+    80% {
+      transform: translateZ(8rem);
+    }
 }
 
 .die-face {

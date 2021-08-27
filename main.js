@@ -19,6 +19,7 @@ const body = document.querySelector("body");
 const dieTemplate = document.querySelector('#die-template');
 const btnAdd = document.querySelector('button.add');
 const btnRemove = document.querySelector('button.remove');
+const dieWrapperSelector = '.dice-wrapper > div:not(.removed)';
 
 body.addEventListener("click", async e => {
   if (e.target !== body) return;
@@ -52,13 +53,36 @@ function addDie() {
   refreshUI()
 }
 
-function removeDie() {
-  wrapper.removeChild(wrapper.lastElementChild);
+async function removeDie() {
+  const dieWrappers = wrapper.querySelectorAll(dieWrapperSelector);
+  const dieWrapper = dieWrappers.item(dieWrappers.length - 1);
+  dieWrapper.classList.add('removed');
   refreshUI();
+
+  const die = dieWrapper.querySelector('.die');
+
+  await die.animate([
+      {
+        offset: .2,
+        opacity: 1,
+        transform: 'translateZ(8rem)',
+      },
+      {
+        opacity: 0,
+        transform: 'translateZ(-20rem)',
+      }
+    ], {
+    duration: 200,
+    easing: 'linear',
+  }).finished;
+
+  die.style.opacity = 0; // Preserve the effect after animation has finished.
+
+  wrapper.removeChild(dieWrapper);
 }
 
 function refreshUI() {
-  const dieCount = document.querySelectorAll(".die").length;
+  const dieCount = wrapper.querySelectorAll(dieWrapperSelector).length;
   if (dieCount <= 1) {
     btnRemove.disabled = true;
     btnRemove.classList.add('disabled');
