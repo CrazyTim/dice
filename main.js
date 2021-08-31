@@ -7,24 +7,25 @@ const transformPositions = [
   {x: -180, y: 0, z: 0},
 ];
 
-const transformOffsets = [ // Offsets to make the dice appear to spin randomly
+const transformOffsets = [ // Offsets that make the dice appear to spin randomly
     {x: 360, y: 360, z: 0},
     {x: 0, y: 360, z: 360},
     {x: 360, y: 0, z: 360},
 ];
 
 const maxDice = 8;
+
 const wrapper = document.querySelector('.dice-wrapper');
-const body = document.querySelector("body");
+const body = document.querySelector('body');
 const dieTemplate = document.querySelector('#die-template');
 const btnAdd = document.querySelector('button.add');
 const btnRemove = document.querySelector('button.remove');
 const dieWrapperSelector = '.dice-wrapper > div:not(.removed)';
 
-body.addEventListener("click", async e => {
+body.addEventListener('click', async e => {
   if (e.target !== body) return;
 
-  const dice = document.querySelectorAll(".die");
+  const dice = document.querySelectorAll('.die');
   for (const die of dice) if (die.dataset.rolling === '1') return;
 
   dice.forEach(async (die) => {
