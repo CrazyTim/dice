@@ -20,7 +20,7 @@ const body = document.querySelector('body');
 const dieTemplate = document.querySelector('#die-template');
 const btnAdd = document.querySelector('button.add');
 const btnRemove = document.querySelector('button.remove');
-const dieWrapperSelector = '.dice-wrapper > div:not(.removed)';
+const dieWrapperSelector = '.die-wrapper:not(.removed)';
 
 body.addEventListener('click', async e => {
   if (e.target !== body) return;
@@ -60,17 +60,19 @@ async function removeDie() {
   dieWrapper.classList.add('removed');
   refreshUI();
 
-  const die = dieWrapper.querySelector('.die');
+  // HACK: CSS perspective is lost when applying opacity on the die, but works if we apply to each face
+  dieWrapper.querySelectorAll('.die-face').forEach(i => {
+    i.classList.add('die-face-hide');
+  });
 
+  const die = dieWrapper.querySelector('.transform-wrapper');
   await die.animate([
       {
         offset: .2,
-        opacity: 1,
-        transform: 'translateZ(8rem)',
+        transform: 'translateZ(8rem) rotate3d(1, -1, 0, var(--base-rotate))',
       },
       {
-        opacity: 0,
-        transform: 'translateZ(-20rem)',
+        transform: 'translateZ(-20rem) rotate3d(1, -1, 0, var(--base-rotate))',
       }
     ], {
     duration: 200,

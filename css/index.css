@@ -3,6 +3,7 @@
   --btn-size: 1.5rem;
   --die-size: 5rem;
   --die-padding: 6%;
+  --base-rotate: 12deg;
 }
 
 * {
@@ -68,26 +69,15 @@ body {
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  perspective: 1000px;
+  perspective: 2000px; /* this really "sells" the 3D effect */
   pointer-events: none;
   height: 80vh;
   width: 70vw;
   gap: 4rem;
-  perspective-origin: 80% 60%;
   flex-wrap: wrap;
   align-content: center;
   max-width: calc((var(--die-size) * 4) + (4rem * 5));
   max-height: calc((var(--die-size) * 4) + (4rem * 5));
-}
-
-/* Die shadow */
-.dice-wrapper > div::before {
-  position: absolute;
-  content: "";
-  display: block;
-  width: var(--die-size);
-  height: var(--die-size);
-  box-shadow: 2rem 2rem 3rem 0rem rgb(0 0 0 / 20%);
 }
 
 .die {
@@ -98,21 +88,12 @@ body {
   list-style-type: none;
   transform-style: preserve-3d;
   width: var(--die-size);
-  animation: 0.2s die-show linear;
 }
 
-@keyframes die-show {
-    from {
-      transform: translateZ(-20rem);
-      opacity: 0;
-    }
-    to {
-      transform: translateZ(0);
-      opacity: 1;
-    }
-    80% {
-      transform: translateZ(8rem);
-    }
+.transform-wrapper {
+  transform-style: preserve-3d;
+  transform: rotate3d(1, -1, 0, var(--base-rotate));
+  animation: .2s die-show linear;
 }
 
 .die-face {
@@ -132,6 +113,11 @@ body {
   padding: var(--die-padding);
   box-sizing: border-box;
   backface-visibility: hidden;
+  animation: .2s die-face-show linear;
+}
+
+.die-face-hide {
+  animation: .2s die-face-hide linear;
 }
 
 .die-face.reverse {
@@ -242,8 +228,32 @@ body {
   grid-area: nine;
 }
 
-@media (min-width: 900px) {
-  .dice-wrapper {
-    perspective: 2000px;
-  }
+@keyframes die-show {
+    from {
+      transform: translateZ(-20rem) rotate3d(1, -1, 0, var(--base-rotate));
+    }
+    to {
+      transform: translateZ(0) rotate3d(1, -1, 0, var(--base-rotate));
+    }
+    80% {
+      transform: translateZ(8rem) rotate3d(1, -1, 0, var(--base-rotate));
+    }
+}
+
+@keyframes die-face-hide {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+}
+
+@keyframes die-face-show {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
 }
