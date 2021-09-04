@@ -1,3 +1,5 @@
+import './no-sleep.js';
+
 const transformPositions = [
   {x: 0, y: 0, z: 0},
   {x: 90, y: 0, z: 0},
@@ -50,7 +52,7 @@ btnAdd.addEventListener('click', addDie);
 btnRemove.addEventListener('click', removeDie);
 
 function addDie() {
-  wrapper.appendChild(dieTemplate.content.cloneNode(true));
+  wrapper.append(dieTemplate.content.cloneNode(true));
   refreshUI()
 }
 
