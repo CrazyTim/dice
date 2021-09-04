@@ -27,36 +27,51 @@ const dieWrapperSelector = '.die-wrapper:not(.removed)';
 initalise();
 
 function initalise() {
-  body.addEventListener('click', async e => {
-    if (e.target !== body) return;
-
-    const dice = document.querySelectorAll('.die');
-    for (const die of dice) if (die.dataset.rolling === '1') return;
-
-    dice.forEach(async (die) => {
-      die.dataset.rolling = 1;
-      const roll = util.getRandomInt(0, 6);
-      const {x, y, z} = calcTransform(roll, ++die.dataset.rollCount);
-      const transform = `rotateX(${x}deg) rotateY(${y}deg) rotateZ(${z}deg)`;
-
-      await die.animate([{transform}], {
-        delay: util.getRandomInt(0, 200), // Add a tiny varation.
-        duration: 1000,
-        easing: 'ease-out',
-      }).finished;
-
-      die.style.transform = transform; // Preserve the effect after animation has finished.
-      die.dataset.value = roll + 1;
-      die.dataset.rolling = 0;
-    });
-  });
-
+  body.addEventListener('click', onBodyClick);
   btnAdd.addEventListener('click', addDie);
   btnRemove.addEventListener('click', removeDie);
-
   util.preventScreenLock();
-
   addDie();
+
+  util.handleLongPress(body, e => {
+    for (const el of e.path){
+      if(el.classList && el.classList.contains('die-wrapper')) {
+        rollDie(el.querySelector('.die'));
+        break;
+      }
+    }
+  });
+
+  // Disable context menu so it doesn't interfer with the long press event.
+  body.addEventListener('contextmenu', e => {
+      e.preventDefault();
+  });
+}
+
+function onBodyClick(e) {
+  if (!e.target.classList.contains('die-wrapper') && e.target !== body) return;
+  const dice = document.querySelectorAll('.die');
+  for (const die of dice) if (die.dataset.rolling === '1') return;
+  dice.forEach(rollDie);
+}
+
+async function rollDie(die) {
+  if (die.dataset.rolling === '1') return;
+
+  die.dataset.rolling = 1;
+  const roll = util.getRandomInt(0, 6);
+  const {x, y, z} = calcTransform(roll, ++die.dataset.rollCount);
+  const transform = `rotateX(${x}deg) rotateY(${y}deg) rotateZ(${z}deg)`;
+
+  await die.animate([{transform}], {
+    delay: util.getRandomInt(0, 200), // Add a tiny varation.
+    duration: 1000,
+    easing: 'ease-out',
+  }).finished;
+
+  die.style.transform = transform; // Preserve the effect after animation has finished.
+  die.dataset.value = roll + 1;
+  die.dataset.rolling = 0;
 }
 
 function addDie() {

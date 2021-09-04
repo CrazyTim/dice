@@ -73,11 +73,16 @@ body {
   pointer-events: none;
   height: 80vh;
   width: 70vw;
-  gap: 4rem;
+  gap: 2rem;
   flex-wrap: wrap;
   align-content: center;
   max-width: calc((var(--die-size) * 4) + (4rem * 5));
   max-height: calc((var(--die-size) * 4) + (4rem * 5));
+}
+
+.die-wrapper {
+  padding: 1rem;
+  pointer-events: all;
 }
 
 .die {
@@ -94,6 +99,7 @@ body {
   transform-style: preserve-3d;
   transform: rotate3d(1, -1, 0, var(--base-rotate));
   animation: .2s die-show linear;
+  pointer-events: none;
 }
 
 .die-face {

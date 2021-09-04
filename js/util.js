@@ -44,3 +44,23 @@ export function getRandomInt(min, max) {
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min)) + min;
 }
+
+/**
+ * Handle long press on an element.
+ * For touch screens only.
+ * You will probably need to prevent default on the contextmenu event before using this.
+ */
+export function handleLongPress(element, callback) {
+  let timer;
+
+  element.addEventListener('touchstart', e => {
+    timer = setTimeout(t => callback(e), 500);
+  });
+
+  element.addEventListener('touchend', cancel);
+  element.addEventListener('touchmove', cancel);
+
+  function cancel() {
+    clearTimeout(timer);
+  }
+}
