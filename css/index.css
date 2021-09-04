@@ -135,11 +135,6 @@ body {
   box-shadow: inset 0 0 0.5rem 0 rgb(0 0 0 / 50%);
 }
 
-.dot.small {
-  height: 66%;
-  width: 66%;
-}
-
 .face-1 {
   transform: rotate3d(0, 0, 0, 90deg) translateZ(calc(0.5 * var(--die-size)));
 }
