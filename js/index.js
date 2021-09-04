@@ -1,4 +1,4 @@
-import './no-sleep.js';
+import * as util from './util.js';
 
 const transformPositions = [
   {x: 0, y: 0, z: 0},
@@ -24,32 +24,40 @@ const btnAdd = document.querySelector('button.add');
 const btnRemove = document.querySelector('button.remove');
 const dieWrapperSelector = '.die-wrapper:not(.removed)';
 
-body.addEventListener('click', async e => {
-  if (e.target !== body) return;
+initalise();
 
-  const dice = document.querySelectorAll('.die');
-  for (const die of dice) if (die.dataset.rolling === '1') return;
+function initalise() {
+  body.addEventListener('click', async e => {
+    if (e.target !== body) return;
 
-  dice.forEach(async (die) => {
-    die.dataset.rolling = 1;
-    const roll = getRandomInt(0, 6);
-    const {x, y, z} = calcTransform(roll, ++die.dataset.rollCount);
-    const transform = `rotateX(${x}deg) rotateY(${y}deg) rotateZ(${z}deg)`;
+    const dice = document.querySelectorAll('.die');
+    for (const die of dice) if (die.dataset.rolling === '1') return;
 
-    await die.animate([{transform}], {
-      delay: getRandomInt(0, 200), // Add a tiny varation.
-      duration: 1000,
-      easing: 'ease-out',
-    }).finished;
+    dice.forEach(async (die) => {
+      die.dataset.rolling = 1;
+      const roll = util.getRandomInt(0, 6);
+      const {x, y, z} = calcTransform(roll, ++die.dataset.rollCount);
+      const transform = `rotateX(${x}deg) rotateY(${y}deg) rotateZ(${z}deg)`;
 
-    die.style.transform = transform; // Preserve the effect after animation has finished.
-    die.dataset.value = roll + 1;
-    die.dataset.rolling = 0;
+      await die.animate([{transform}], {
+        delay: util.getRandomInt(0, 200), // Add a tiny varation.
+        duration: 1000,
+        easing: 'ease-out',
+      }).finished;
+
+      die.style.transform = transform; // Preserve the effect after animation has finished.
+      die.dataset.value = roll + 1;
+      die.dataset.rolling = 0;
+    });
   });
-});
 
-btnAdd.addEventListener('click', addDie);
-btnRemove.addEventListener('click', removeDie);
+  btnAdd.addEventListener('click', addDie);
+  btnRemove.addEventListener('click', removeDie);
+
+  util.preventScreenLock();
+
+  addDie();
+}
 
 function addDie() {
   wrapper.append(dieTemplate.content.cloneNode(true));
@@ -83,7 +91,7 @@ async function removeDie() {
 
   die.style.opacity = 0; // Preserve the effect after animation has finished.
 
-  wrapper.removeChild(dieWrapper);
+  dieWrapper.remove();
 }
 
 function refreshUI() {
@@ -114,11 +122,3 @@ function calcTransform(roll = 0, counter) {
     z: r.z + v.z,
   }
 }
-
-function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min)) + min;
-}
-
-addDie();
