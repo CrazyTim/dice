@@ -22,9 +22,9 @@
   });
 
   function addSourceToVideo(element, type, dataURI) {
-      const source = document.createElement('source');
-      source.src = dataURI;
-      source.type = 'video/' + type;
+    const source = document.createElement('source');
+    source.src = dataURI;
+    source.type = 'video/' + type;
     element.appendChild(source);
   }
 
@@ -45,21 +45,50 @@ export function getRandomInt(min, max) {
 }
 
 /**
- * Handle long press on an element.
- * For touch screens only.
- * You will probably need to prevent default on the contextmenu event before using this.
+ * Register event listeners for touching and holding over an element for a certain duration.
+ * Two handlers are supplied, one for touching less than the duration,
+ * and the second for touching longer than the duration.
  */
-export function handleLongPress(element, callback) {
-  let timer;
+export function handleLongTouch(element, touchHandler, longTouchHandler, duration = 500, pixelMoveThreshold = 5) {
 
-  element.addEventListener('touchstart', e => {
-    timer = setTimeout(t => callback(e), 500);
+  let timer;
+  let point = null;
+
+  element.addEventListener('pointerdown', e => {
+    point = {x: e.clientX, y: e.clientY};
+    timer = setTimeout(t => handlePointerLongDown(e), duration);
   });
 
-  element.addEventListener('touchend', cancel);
-  element.addEventListener('touchmove', cancel);
+  element.addEventListener('pointerup', handlePointerUp);
+  element.addEventListener('pointercancel', handlePointerUp);
+  element.addEventListener('pointermove', handlePointerMove);
 
-  function cancel() {
+  function handlePointerUp(e) {
+    if (!point) return;
+    point = null;
     clearTimeout(timer);
+    touchHandler(e);
   }
+
+  function handlePointerMove(e) {
+    if (!point) return;
+
+    // Ignore if still within the pixel threshhold:
+    if (Math.abs(point.x - e.clientX) < pixelMoveThreshold || Math.abs(point.y - e.clientY) < pixelMoveThreshold) return;
+
+    point = null;
+    clearTimeout(timer);
+    touchHandler(e);
+  }
+
+  function handlePointerLongDown(e) {
+    point = null;
+    longTouchHandler(e);
+  }
+
+  // Disable the context menu so it doesn't interfer:
+  element.addEventListener('contextmenu', e => {
+    e.preventDefault();
+  });
+
 }

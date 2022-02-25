@@ -27,32 +27,30 @@ const dieWrapperSelector = '.die-wrapper:not(.removed)';
 initalise();
 
 function initalise() {
-  body.addEventListener('click', onBodyClick);
   btnAdd.addEventListener('click', addDie);
   btnRemove.addEventListener('click', removeDie);
   util.preventScreenLock();
   addDie();
 
-  util.handleLongPress(body, e => {
-    for (const el of e.path){
-      if(el.classList && el.classList.contains('die-wrapper')) {
-        rollDie(el.querySelector('.die'));
-        break;
+  util.handleLongTouch(
+    body,
+    e => {
+      console.log('short touch')
+      if (!e.target.classList.contains('die-wrapper') && e.target !== body) return;
+      const dice = document.querySelectorAll('.die');
+      for (const die of dice) if (die.dataset.rolling === '1') return;
+      dice.forEach(rollDie);
+    },
+    e => {
+      console.log('long touch')
+      for (const el of e.path) {
+        if(el.classList && el.classList.contains('die-wrapper')) {
+          rollDie(el.querySelector('.die'));
+          break;
+        }
       }
     }
-  });
-
-  // Disable context menu so it doesn't interfer with the long press event.
-  body.addEventListener('contextmenu', e => {
-      e.preventDefault();
-  });
-}
-
-function onBodyClick(e) {
-  if (!e.target.classList.contains('die-wrapper') && e.target !== body) return;
-  const dice = document.querySelectorAll('.die');
-  for (const die of dice) if (die.dataset.rolling === '1') return;
-  dice.forEach(rollDie);
+  );
 }
 
 async function rollDie(die) {
