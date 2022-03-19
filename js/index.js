@@ -15,11 +15,23 @@ const transformOffsets = [ // Offsets that make the dice appear to spin randomly
     {x: 360, y: 0, z: 360},
 ];
 
+const initialAppState = {
+  dice: [{
+    value: 6,
+    rollCount: 24,
+  }],
+};
+
+const newDieState = {
+  value: 4,
+  rollCount: 0,
+};
+
 const maxDice = 8;
 
 const wrapper = document.querySelector('.dice-wrapper');
 const body = document.querySelector('body');
-const dieTemplate = document.querySelector('#die-template');
+const dieWrapperTemplate = document.querySelector('#die-wrapper-template');
 const btnAdd = document.querySelector('button.add');
 const btnRemove = document.querySelector('button.remove');
 const dieWrapperSelector = '.die-wrapper:not(.removed)';
@@ -28,24 +40,23 @@ initalise();
 
 function initalise() {
   btnAdd.addEventListener('click', addDie);
-  btnRemove.addEventListener('click', removeDie);
+  btnRemove.addEventListener('click', removeLastDie);
   util.preventScreenLock();
-  addDie();
+  loadAppState();
 
   util.handleLongTouch(
     body,
-    e => {
+    async e => {
       console.log('short touch')
       if (!e.target.classList.contains('die-wrapper') && e.target !== body) return;
-      const dice = document.querySelectorAll('.die');
-      for (const die of dice) if (die.dataset.rolling === '1') return;
-      dice.forEach(rollDie);
+      rollAllDice();
     },
-    e => {
+    async e => {
       console.log('long touch')
       for (const el of e.path) {
         if(el.classList && el.classList.contains('die-wrapper')) {
-          rollDie(el.querySelector('.die'));
+          await rollDie(el.querySelector('.die'));
+          saveAppState();
           break;
         }
       }
@@ -53,31 +64,81 @@ function initalise() {
   );
 }
 
+function loadAppState() {
+  console.log('load app state');
+  const appState = JSON.parse(localStorage.getItem('state')) || initialAppState;
+  appState.dice.forEach(diceState => addDie({
+    ...diceState, 
+    shouldSaveAppState: false, // Don't save twice.
+  }));
+}
+
+function saveAppState() {
+  console.log('save app state');
+  const appState = {
+    dice: [],
+  }
+  for (const el of wrapper.children) {
+    const die = el.querySelector('.die');
+    appState.dice.push({
+      value: die.dataset.value,
+      rollCount: die.dataset.rollCount,
+    });
+  }
+  localStorage.setItem('state', JSON.stringify(appState));
+}
+
+async function rollAllDice() {
+  const dice = document.querySelectorAll('.die');
+  for (const die of dice) if (die.dataset.rolling === '1') return;
+
+  const promises = [];
+  for (const i of dice) {
+    promises.push(rollDie(i));
+  }
+  await Promise.all(promises); // Wait until dice have finished rolling.
+  
+  saveAppState(); 
+}
+
 async function rollDie(die) {
   if (die.dataset.rolling === '1') return;
-
   die.dataset.rolling = 1;
-  const roll = util.getRandomInt(0, 6);
-  const {x, y, z} = calcTransform(roll, ++die.dataset.rollCount);
-  const transform = `rotateX(${x}deg) rotateY(${y}deg) rotateZ(${z}deg)`;
 
-  await die.animate([{transform}], {
+  const rollValue = util.getRandomInt(0, 6) + 1;
+  const cssTransform = calcTransformCss(rollValue, ++die.dataset.rollCount);
+
+  await die.animate([{transform: cssTransform}], {
     delay: util.getRandomInt(0, 200), // Add a tiny varation.
     duration: 1000,
     easing: 'ease-out',
   }).finished;
 
-  die.style.transform = transform; // Preserve the effect after animation has finished.
-  die.dataset.value = roll + 1;
+  die.style.transform = cssTransform; // Preserve the effect after animation has finished.
+  die.dataset.value = rollValue;
   die.dataset.rolling = 0;
 }
 
-function addDie() {
-  wrapper.append(dieTemplate.content.cloneNode(true));
+function addDie({
+  value = newDieState.value,
+  rollCount = newDieState.rollCount,
+  shouldSaveAppState = true,
+} = {}) {
+  const newDieWrapper = dieWrapperTemplate.content.cloneNode(true);
+  const die = newDieWrapper.querySelector('.die');
+
+  // Set die state:
+  die.dataset.value = value;
+  die.dataset.rollCount = rollCount;
+  die.dataset.rolling = 0;
+  die.style.transform = calcTransformCss(value, rollCount);
+
+  wrapper.append(newDieWrapper);
   refreshUI()
+  if (shouldSaveAppState) saveAppState();
 }
 
-async function removeDie() {
+async function removeLastDie() {
   const dieWrappers = wrapper.querySelectorAll(dieWrapperSelector);
   const dieWrapper = dieWrappers.item(dieWrappers.length - 1);
   dieWrapper.classList.add('removed');
@@ -105,6 +166,7 @@ async function removeDie() {
   die.style.opacity = 0; // Preserve the effect after animation has finished.
 
   dieWrapper.remove();
+  saveAppState();
 }
 
 function refreshUI() {
@@ -125,13 +187,11 @@ function refreshUI() {
   }
 }
 
-function calcTransform(roll = 0, counter) {
-  const r = transformPositions[roll];
-  const v = transformOffsets[counter % transformOffsets.length];
-
-  return {
-    x: r.x + v.x,
-    y: r.y + v.y,
-    z: r.z + v.z,
-  }
+function calcTransformCss(rollValue, rollCount) {
+  const pos = transformPositions[rollValue - 1];
+  const off = transformOffsets[rollCount % transformOffsets.length];
+  const x = pos.x + off.x;
+  const y = pos.y + off.y;
+  const z = pos.z + off.z;
+  return `rotateX(${x}deg) rotateY(${y}deg) rotateZ(${z}deg)`;
 }
