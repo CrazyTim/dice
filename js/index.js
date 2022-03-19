@@ -60,7 +60,8 @@ function initalise() {
           break;
         }
       }
-    }
+    },
+    250
   );
 }
 
